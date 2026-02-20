@@ -45,29 +45,17 @@
     .modal-back{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(2,6,23,0.4);display:flex;align-items:center;justify-content:center;z-index:60}
     .modal{background:var(--card);padding:18px;border-radius:12px;max-width:820px;width:100%;box-shadow:0 12px 40px rgba(2,6,23,0.12);position:relative}
     .modal .close-x{position:absolute;right:12px;top:12px;background:var(--danger);color:white;border-radius:999px;border:0;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-    /* mesaj bar */
     #message-bar{display:none;padding:10px 14px;border-radius:10px;margin-bottom:12px;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#001; font-weight:700}
-    /* admin panel büyütme */
-    #page-admin .card{min-height:220px}
-    #page-admin { font-size:15px; }
-    #page-admin .admin-grid { display:grid; grid-template-columns: 2fr 1fr; gap:14px; }
-    #page-admin .admin-listing { margin-top:12px; }
-    footer{text-align:center;color:var(--muted);margin-top:16px;font-size:13px}
     @media (max-width:920px){
       #page-admin .admin-grid { grid-template-columns: 1fr; }
       header{flex-direction:column;align-items:flex-start}
     }
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:6px;border-bottom:1px solid rgba(3,41,47,0.04);text-align:left}
-
-    /* collapse item styles */
     .item { border-radius:10px;border:1px solid rgba(3,41,47,0.03);margin-bottom:8px;background:var(--card);overflow:hidden; }
     .item-header { display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer; }
     .item-header .title { font-weight:700; font-size:15px; color:#03292f; }
     .item-header .meta { color:var(--muted); font-size:13px; margin-left:8px; }
     .item-details { padding:12px;border-top:1px solid rgba(3,41,47,0.04); display:none; animation:fadeIn .18s ease; }
     .item-details.open { display:block; }
-    .item-details .row { gap:8px; }
     .small-muted { color:var(--muted); font-size:13px; }
     @keyframes fadeIn { from {opacity:0; transform:translateY(-4px)} to {opacity:1; transform:translateY(0)} }
   </style>
@@ -102,7 +90,6 @@
       </div>
     </header>
 
-    <!-- mesaj bar: artık alert() yerine buraya yazılıyor -->
     <div id="message-bar" role="status" aria-live="polite"></div>
 
     <main>
@@ -151,7 +138,6 @@
       <section id="page-subscriptions" class="page card">
         <h2>Abonelikler</h2>
         <div id="subs-list" class="small" style="margin-top:12px"></div>
-        <!-- (Not: kullanıcı abonelikleri artık sadece Envanter sayfasında görünür) -->
       </section>
 
       <section id="page-offers" class="page card">
@@ -167,7 +153,7 @@
       <section id="page-admin" class="page card hidden">
         <h2>Admin Panel</h2>
 
-        <div class="admin-grid">
+        <div class="admin-grid" style="display:grid;grid-template-columns:2fr 1fr;gap:14px">
           <div>
             <div class="card">
               <div style="font-weight:700;margin-bottom:8px">Yeni Paket / Düzenle</div>
@@ -202,6 +188,7 @@
               <input id="sub-desc" placeholder="Açıklama (opsiyonel)" />
               <div style="display:flex;gap:8px;margin-top:8px"><button id="btn-add-sub">Ekle</button><button id="btn-update-sub" class="subtle hidden">Güncelle</button></div>
             </div>
+
             <div class="card" style="margin-top:12px">
               <div style="display:flex;justify-content:space-between;align-items:center">
                 <div style="font-weight:700">Abonelik İşlemleri</div>
@@ -221,7 +208,6 @@
               <!-- paket/teklif/abonelik tabloları buraya yüklenecek -->
             </div>
 
-            <!-- Yeni: paket düzenleme alt paneli (en altta) -->
             <div class="card" id="admin-pack-edit-area" style="margin-top:12px">
               <div style="font-weight:700;margin-bottom:8px">Paketleri Düzenle (Alt Panel)</div>
               <div style="display:flex;gap:8px;align-items:center">
@@ -232,16 +218,32 @@
               </div>
               <div class="muted small" style="margin-top:8px">Seçilen paketi formda düzenleyip "Güncelle"ye basın.</div>
             </div>
+
+            <div class="card" id="admin-purchase-history" style="margin-top:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="font-weight:700">Satın Alma Geçmişi (Global)</div>
+                <div style="display:flex;gap:6px">
+                  <select id="ph-filter">
+                    <option value="all">Tümü</option>
+                    <option value="package">Paket</option>
+                    <option value="offer">Teklif</option>
+                    <option value="subscription">Abonelik</option>
+                  </select>
+                  <button id="ph-refresh" class="subtle">Yenile</button>
+                </div>
+              </div>
+              <div id="ph-list" class="small muted" style="margin-top:8px">Yükleniyor...</div>
+            </div>
+
           </div>
         </div>
       </section>
-
     </main>
 
     <footer>Island & Eternity — Store</footer>
   </div>
 
-  <!-- Verification modal -->
+  <!-- verification modal -->
   <div id="verify-modal" class="modal-back" style="display:none">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="verify-title">
       <button class="close-x" id="verify-close-x" title="İptal">✕</button>
@@ -250,13 +252,11 @@
     </div>
   </div>
 
-  <!-- Admin: kullanıcı detay modal -->
+  <!-- user detail modal -->
   <div id="user-detail-modal" class="modal-back" style="display:none">
     <div class="modal" role="dialog" aria-modal="true">
       <button class="close-x" id="user-detail-close">✕</button>
-      <div id="user-detail-body">
-        <!-- doldurulacak -->
-      </div>
+      <div id="user-detail-body"></div>
     </div>
   </div>
 
@@ -264,7 +264,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, runTransaction, serverTimestamp, query, orderBy, where } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, runTransaction, serverTimestamp, query, orderBy, where, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
     // FIREBASE CONFIG
     const firebaseConfig = {
@@ -282,35 +282,7 @@
     await setPersistence(auth, browserSessionPersistence);
     const db = getFirestore(app);
 
-    // ---- GLOBAL PLACEHOLDERS (modül tam yüklenmeden önce ReferenceError olmaması için) ----
-    // Bunlar gerçek fonksiyonlar tanımlandığında üzerine yazılacak.
-    window.adminRunBillingAll = window.processDueSubscriptionsForUser = window.showInventory = window.userCancelSubscription = function(){
-      console.warn('placeholder called before module initialization');
-    };
-
-    // ROUTING & REFS
-    const pages = {
-      home: document.getElementById('page-home'),
-      login: document.getElementById('page-login'),
-      store: document.getElementById('page-store'),
-      subscriptions: document.getElementById('page-subscriptions'),
-      offers: document.getElementById('page-offers'),
-      inventory: document.getElementById('page-inventory'),
-      admin: document.getElementById('page-admin'),
-    };
-    function showPage(name){
-      Object.values(pages).forEach(p=>p.classList.remove('active'));
-      const p = pages[name];
-      if(p) p.classList.add('active');
-    }
-    function handleHash(){
-      const h = (location.hash||'#home').replace('#','');
-      if(!pages[h]) { showPage('home'); location.hash = '#home'; }
-      else showPage(h);
-    }
-    window.addEventListener('hashchange', handleHash);
-    handleHash();
-
+    // Helper shortcuts
     const $ = id => document.getElementById(id);
     const usernameInput = $('username'), passwordInput = $('password'), btnRegister = $('btn-register'), btnLogin = $('btn-login');
     const navLogin = $('nav-login'), navAdmin = $('nav-admin'), navInv = $('nav-inv');
@@ -327,25 +299,22 @@
     const subTitle = $('sub-title'), subPrice = $('sub-price'), subInterval = $('sub-interval'), subCustomDays = $('sub-custom-days'), subAmount = $('sub-amount'), subDesc = $('sub-desc'), btnAddSub = $('btn-add-sub'), btnUpdateSub = $('btn-update-sub');
     const adminUsersList = $('admin-users-list');
     const adminRunBillingBtn = $('admin-run-billing');
-
     const userDetailModal = $('user-detail-modal'), userDetailBody = $('user-detail-body'), userDetailClose = $('user-detail-close');
-
-    // bottom edit area refs
     const adminEditPkgSelect = $('admin-edit-pkg-select'), adminEditPkgLoad = $('admin-edit-pkg-load');
+    const phList = $('ph-list'), phFilter = $('ph-filter'), phRefresh = $('ph-refresh');
 
     // state
     let pendingPurchase = null;
+    let messageTimer = null;
     let currentUserIsAdmin = false;
 
-    // message bar (replaces alert)
-    let messageTimer = null;
+    // small utilities
     function toast(msg){
       if(messageTimer) clearTimeout(messageTimer);
       messageBar.textContent = msg;
       messageBar.style.display = 'block';
       messageTimer = setTimeout(()=>{ messageBar.style.display = 'none'; messageBar.textContent = ''; }, 4500);
     }
-
     function usernameToEmail(u){ return `${u}@island.local`; }
     function fmtReward(r){
       if(!r) return '';
@@ -355,68 +324,20 @@
       if(r.type==='item') return `${r.amount? r.amount + 'x ' : ''}${r.name || r.id || 'Öğe'}`;
       return `${r.amount || ''} ${r.type || ''}`.trim();
     }
-    function formatRewards(arr){
-      if(!Array.isArray(arr)) return '';
-      return arr.map(fmtReward).join(' • ');
-    }
-
-    // interval localization
-    const intervalLabel = (key) => {
-      if(key === 'daily') return 'Günlük';
-      if(key === 'weekly') return 'Haftalık';
-      if(key === 'custom') return 'Özel';
-      return key;
-    };
-
-    // ---- YENİ: ödül girişi ayrıştırıcı (çok toleranslı) ----
+    function formatRewards(arr){ if(!Array.isArray(arr)) return ''; return arr.map(fmtReward).join(' • '); }
+    function intervalLabel(key){ if(key==='daily') return 'Günlük'; if(key==='weekly') return 'Haftalık'; if(key==='custom') return 'Özel'; return key; }
     function parseRewardInput(input){
       const v = (input||'').toString().trim();
       if(!v) return [];
-      // try JSON
-      try {
-        const js = JSON.parse(v);
-        if(Array.isArray(js)) return js;
-        if(typeof js === 'object' && js !== null) return [js];
-      } catch(e){}
-      // "123 name..." pattern
-      const m = v.match(/^\s*(\d+)\s+(.+)$/);
-      if(m){
-        const amount = Number(m[1]);
-        const name = m[2].trim();
-        return [{ type:'item', name, amount }];
-      }
-      // only number => diamond
-      const m2 = v.match(/^\s*(\d+)\s*$/);
-      if(m2){
-        return [{ type:'diamond', amount: Number(m2[1]) }];
-      }
-      // free text => item name
+      try { const js = JSON.parse(v); if(Array.isArray(js)) return js; if(typeof js === 'object' && js !== null) return [js]; } catch(e){}
+      const m = v.match(/^\s*(\d+)\s+(.+)$/); if(m) return [{ type:'item', name: m[2].trim(), amount: Number(m[1]) }];
+      const m2 = v.match(/^\s*(\d+)\s*$/); if(m2) return [{ type:'diamond', amount: Number(m2[1]) }];
       return [{ type:'item', name: v }];
     }
-    // ---------------------------------------
+    function parseDateToTs(dstr){ if(!dstr) return null; const m = dstr.match(/^(\d{4})-(\d{2})-(\d{2})$/); if(m){ const [y,mo,day] = [Number(m[1]), Number(m[2])-1, Number(m[3])]; const dt = new Date(y,mo,day,0,0,0,0); return dt.getTime(); } const dt = new Date(dstr); if(!isNaN(dt.getTime())) return dt.getTime(); return null; }
+    function daysRemainingFromTs(ts){ if(!ts) return null; const diff = ts - Date.now(); return Math.ceil(diff / (24*3600*1000)); }
 
-    // helper: parse date string YYYY-MM-DD -> timestamp (midnight local)
-    function parseDateToTs(dstr){
-      if(!dstr) return null;
-      const m = dstr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-      if(m){
-        const [y,mo,day] = [Number(m[1]), Number(m[2])-1, Number(m[3])];
-        const dt = new Date(y,mo,day,0,0,0,0);
-        return dt.getTime();
-      }
-      const dt = new Date(dstr);
-      if(!isNaN(dt.getTime())) return dt.getTime();
-      return null;
-    }
-
-    function daysRemainingFromTs(ts){
-      if(!ts) return null;
-      const diff = ts - Date.now();
-      const days = Math.ceil(diff / (24*3600*1000));
-      return days;
-    }
-
-    // admin check: config/admins OR users/{uid}.username === 'alper'
+    // admin check
     async function isAdminUid(uid){
       try {
         const cfg = await getDoc(doc(db,'config','admins'));
@@ -430,6 +351,21 @@
         return (udata.username === 'alper');
       } catch(e){ console.error(e); return false; }
     }
+
+    // ROUTING set up
+    const pages = {
+      home: document.getElementById('page-home'),
+      login: document.getElementById('page-login'),
+      store: document.getElementById('page-store'),
+      subscriptions: document.getElementById('page-subscriptions'),
+      offers: document.getElementById('page-offers'),
+      inventory: document.getElementById('page-inventory'),
+      admin: document.getElementById('page-admin'),
+    };
+    function showPage(name){ Object.values(pages).forEach(p=>p.classList.remove('active')); const p = pages[name]; if(p) p.classList.add('active'); }
+    function handleHash(){ const h = (location.hash||'#home').replace('#',''); if(!pages[h]) { showPage('home'); location.hash = '#home'; } else showPage(h); }
+    window.addEventListener('hashchange', handleHash);
+    handleHash();
 
     // AUTH
     btnRegister.addEventListener('click', async ()=>{
@@ -454,7 +390,6 @@
 
     btnLogout.addEventListener('click', async ()=>{ await signOut(auth); location.hash='#login'; });
 
-    // on auth change: show nav items, process due subs for current user
     onAuthStateChanged(auth, async (user)=>{
       if(user){
         const snap = await getDoc(doc(db,'users',user.uid));
@@ -467,7 +402,7 @@
         const admin = await isAdminUid(user.uid);
         currentUserIsAdmin = admin;
         if(admin) navAdmin.classList.remove('hidden'); else navAdmin.classList.add('hidden');
-        // process due subscriptions for this user when they log in
+        // process due subscriptions for this user
         await processDueSubscriptionsForUser(user.uid);
         if(location.hash === '#login' || location.hash === '') location.hash = '#store';
       } else {
@@ -478,42 +413,24 @@
       await loadAdminUsersList();
     });
 
-    // create a package DOM element (collapsed by default)
+    // --- UI builders with recent purchasers area added ---
     function createPackageElement(d, id){
-      const wrapper = document.createElement('div');
-      wrapper.className = 'item';
-      const header = document.createElement('div');
-      header.className = 'item-header';
-      const title = document.createElement('div');
-      title.className = 'title';
-      title.textContent = d.title || 'Unnamed package';
-      const right = document.createElement('div');
-      right.className = 'meta';
-      // show small meta like price or stock briefly
-      right.innerHTML = `<span class="small-muted">${d.price || 0} ₺</span>`;
-      header.appendChild(title);
-      header.appendChild(right);
+      const wrapper = document.createElement('div'); wrapper.className='item';
+      const header = document.createElement('div'); header.className='item-header';
+      const title = document.createElement('div'); title.className='title'; title.textContent = d.title || 'Unnamed package';
+      const right = document.createElement('div'); right.className='meta'; right.innerHTML = `<span class="small-muted">${d.price || 0} ₺</span>`;
+      header.appendChild(title); header.appendChild(right);
 
-      const details = document.createElement('div');
-      details.className = 'item-details';
-      // content when expanded
+      const details = document.createElement('div'); details.className='item-details';
       const rewards = Array.isArray(d.rewards) ? formatRewards(d.rewards) : '';
       const desc = d.desc ? `<div class="small-muted">${d.desc}</div>` : '';
       const stockText = (typeof d.stock==='number' && d.stock<=0) ? '<span style="color:var(--danger)">stok bitti</span>' : `stok: ${d.stock || 0}`;
-      // expires
       let expiresHtml = '';
-      if(d.expiresAtTs){
-        const days = daysRemainingFromTs(d.expiresAtTs);
-        expiresHtml = `<div class="small-muted">Bitiş: ${new Date(Number(d.expiresAtTs)).toLocaleDateString()} • ${days>0? days + ' gün kaldı' : 'süresi doldu'}</div>`;
-      } else if(d.expiresAt){
-        const ts = parseDateToTs(d.expiresAt);
-        if(ts){
-          const days = daysRemainingFromTs(ts);
-          expiresHtml = `<div class="small-muted">Bitiş: ${new Date(ts).toLocaleDateString()} • ${days>0? days + ' gün kaldı' : 'süresi doldu'}</div>`;
-        }
-      } else if(d.durationDays){
-        expiresHtml = `<div class="small-muted">Süre: ${d.durationDays} gün</div>`;
-      }
+      if(d.expiresAtTs){ const days = daysRemainingFromTs(d.expiresAtTs); expiresHtml = `<div class="small-muted">Bitiş: ${new Date(Number(d.expiresAtTs)).toLocaleDateString()} • ${days>0? days + ' gün kaldı' : 'süresi doldu'}</div>`; }
+      else if(d.expiresAt){ const ts = parseDateToTs(d.expiresAt); if(ts){ const days = daysRemainingFromTs(ts); expiresHtml = `<div class="small-muted">Bitiş: ${new Date(ts).toLocaleDateString()} • ${days>0? days + ' gün kaldı' : 'süresi doldu'}</div>`; } }
+      else if(d.durationDays){ expiresHtml = `<div class="small-muted">Süre: ${d.durationDays} gün</div>`; }
+
+      // Placeholder for previous purchasers (will be filled asynchronously)
       details.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div style="font-weight:700">${d.title}</div>
@@ -524,51 +441,27 @@
         <div style="margin-top:8px" class="small-muted">${stockText}</div>
         <div style="margin-top:8px">${expiresHtml}</div>
         <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end"><button onclick="startPurchase('package','${id}')">Satın Al</button></div>
+        <div style="margin-top:12px"><strong>Önceki satın alanlar (son 5)</strong><div id="recent-purchasers-package-${id}" class="small muted" style="margin-top:6px">Yükleniyor...</div></div>
       `;
 
-      header.addEventListener('click', ()=> {
-        const open = details.classList.toggle('open');
-        // scroll into view a bit when opening
-        if(open) wrapper.scrollIntoView({behavior:'smooth', block:'nearest'});
-      });
-
-      wrapper.appendChild(header);
-      wrapper.appendChild(details);
-      return wrapper;
+      header.addEventListener('click', ()=>{ const open = details.classList.toggle('open'); if(open) { wrapper.scrollIntoView({behavior:'smooth', block:'nearest'}); loadRecentPurchasersForItem('package', id); } });
+      wrapper.appendChild(header); wrapper.appendChild(details); return wrapper;
     }
 
-    // create offer element (collapsed)
     function createOfferElement(d, id){
-      const wrapper = document.createElement('div');
-      wrapper.className = 'item';
-      const header = document.createElement('div');
-      header.className = 'item-header';
-      const title = document.createElement('div');
-      title.className = 'title';
-      title.textContent = d.title || 'Unnamed offer';
-      const right = document.createElement('div');
-      right.className = 'meta';
-      right.innerHTML = `<span class="small-muted">${d.price || 0} ₺</span>`;
-      header.appendChild(title);
-      header.appendChild(right);
-
-      const details = document.createElement('div');
-      details.className = 'item-details';
+      const wrapper = document.createElement('div'); wrapper.className='item';
+      const header = document.createElement('div'); header.className='item-header';
+      const title = document.createElement('div'); title.className='title'; title.textContent = d.title || 'Unnamed offer';
+      const right = document.createElement('div'); right.className='meta'; right.innerHTML = `<span class="small-muted">${d.price || 0} ₺</span>`;
+      header.appendChild(title); header.appendChild(right);
+      const details = document.createElement('div'); details.className='item-details';
       const rewards = Array.isArray(d.rewards) ? formatRewards(d.rewards) : '';
       const desc = d.desc ? `<div class="small-muted">${d.desc}</div>` : '';
       const stockText = (typeof d.stock==='number' && d.stock<=0) ? '<span style="color:var(--danger)">stok bitti</span>' : `stok: ${d.stock || 0}`;
-      // expires
       let expiresHtml = '';
-      if(d.expiresAtTs){
-        const days = daysRemainingFromTs(d.expiresAtTs);
-        expiresHtml = `<div class="small-muted">Bitiş: ${new Date(Number(d.expiresAtTs)).toLocaleDateString()} • ${days>0? days + ' gün kaldı' : 'süresi doldu'}</div>`;
-      } else if(d.expiresAt){
-        const ts = parseDateToTs(d.expiresAt);
-        if(ts){
-          const days = daysRemainingFromTs(ts);
-          expiresHtml = `<div class="small-muted">Bitiş: ${new Date(ts).toLocaleDateString()} • ${days>0? days + ' gün kaldı' : 'süresi doldu'}</div>`;
-        }
-      }
+      if(d.expiresAtTs){ const days = daysRemainingFromTs(d.expiresAtTs); expiresHtml = `<div class="small-muted">Bitiş: ${new Date(Number(d.expiresAtTs)).toLocaleDateString()} • ${days>0? days + ' gün kaldı' : 'süresi doldu'}</div>`; }
+      else if(d.expiresAt){ const ts = parseDateToTs(d.expiresAt); if(ts){ const days = daysRemainingFromTs(ts); expiresHtml = `<div class="small-muted">Bitiş: ${new Date(ts).toLocaleDateString()} • ${days>0? days + ' gün kaldı' : 'süresi doldu'}</div>`; } }
+
       details.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div style="font-weight:700">${d.title}</div>
@@ -579,35 +472,51 @@
         <div style="margin-top:8px" class="small-muted">${stockText}</div>
         <div style="margin-top:8px">${expiresHtml}</div>
         <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end"><button onclick="startPurchase('offer','${id}')">Satın Al</button></div>
+        <div style="margin-top:12px"><strong>Önceki satın alanlar (son 5)</strong><div id="recent-purchasers-offer-${id}" class="small muted" style="margin-top:6px">Yükleniyor...</div></div>
       `;
 
-      header.addEventListener('click', ()=> {
-        const open = details.classList.toggle('open');
-        if(open) wrapper.scrollIntoView({behavior:'smooth', block:'nearest'});
-      });
-
-      wrapper.appendChild(header);
-      wrapper.appendChild(details);
-      return wrapper;
+      header.addEventListener('click', ()=>{ const open = details.classList.toggle('open'); if(open){ wrapper.scrollIntoView({behavior:'smooth', block:'nearest'}); loadRecentPurchasersForItem('offer', id); } });
+      wrapper.appendChild(header); wrapper.appendChild(details); return wrapper;
     }
 
-    // DATA LOADERS (updated to filter subscription templates and move user-subs to inventory only)
+    // load recent purchasers for an item (type: package|offer|subscription)
+    async function loadRecentPurchasersForItem(type, itemId){
+      try {
+        const containerId = type === 'package' ? `recent-purchasers-package-${itemId}` : `recent-purchasers-offer-${itemId}`;
+        const container = document.getElementById(containerId);
+        if(!container) return;
+        container.innerHTML = 'Yükleniyor...';
+        const q = query(collection(db,'purchases'), where('type','==',type), where('itemId','==',itemId), orderBy('createdAt','desc'), limit(5));
+        const snap = await getDocs(q);
+        if(snap.empty){ container.innerHTML = '<div class="muted small">Henüz satın alınmamış</div>'; return; }
+        let html = '';
+        for(const p of snap.docs){
+          const pd = p.data();
+          const purchaseDate = pd.createdAt && pd.createdAt.toDate ? pd.createdAt.toDate().toLocaleString() : (pd.createdAt? new Date(pd.createdAt).toLocaleString() : '—');
+          let userLabel = pd.userId || '—';
+          try {
+            if(pd.userId){
+              const uDoc = await getDoc(doc(db,'users',pd.userId));
+              if(uDoc.exists()){
+                const ud = uDoc.data();
+                userLabel = ud.displayName || ud.username || pd.userId;
+              }
+            }
+          } catch(e){ console.warn('user fetch failed', e); }
+          html += `<div style="padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.02)"><div style="font-weight:700">${userLabel}</div><div class="small-muted">${purchaseDate} • ${pd.price || 0}₺</div></div>`;
+        }
+        container.innerHTML = html;
+      } catch(e){ console.error('loadRecentPurchasersForItem error', e); }
+    }
+
+    // Loaders
     async function loadPackages(){
       const user = auth.currentUser;
       packagesList.innerHTML = user ? 'Yükleniyor...' : '<div class="muted">Görmek için giriş yap</div>';
       if(!user) return;
       const snap = await getDocs(collection(db,'packages'));
       packagesList.innerHTML = '';
-      snap.forEach(s=>{
-        const d = s.data(), id = s.id;
-        // ensure expiresAtTs exists if expiresAt string present
-        if(d.expiresAt && !d.expiresAtTs){
-          const ts = parseDateToTs(d.expiresAt);
-          if(ts) d.expiresAtTs = ts;
-        }
-        const el = createPackageElement(d, id);
-        packagesList.appendChild(el);
-      });
+      snap.forEach(s=>{ const d = s.data(), id = s.id; if(d.expiresAt && !d.expiresAtTs){ const ts = parseDateToTs(d.expiresAt); if(ts) d.expiresAtTs = ts; } packagesList.appendChild(createPackageElement(d,id)); });
       if(packagesList.innerHTML==='') packagesList.innerHTML = '<div class="muted">Hiç paket yok</div>';
     }
 
@@ -617,41 +526,23 @@
       if(!user) return;
       const snap = await getDocs(collection(db,'offers'));
       offersList.innerHTML = '';
-      snap.forEach(s=>{
-        const d = s.data(), id = s.id;
-        if(d.expiresAt && !d.expiresAtTs){
-          const ts = parseDateToTs(d.expiresAt);
-          if(ts) d.expiresAtTs = ts;
-        }
-        const el = createOfferElement(d, id);
-        offersList.appendChild(el);
-      });
+      snap.forEach(s=>{ const d = s.data(), id = s.id; if(d.expiresAt && !d.expiresAtTs){ const ts = parseDateToTs(d.expiresAt); if(ts) d.expiresAtTs = ts; } offersList.appendChild(createOfferElement(d,id)); });
       if(offersList.innerHTML==='') offersList.innerHTML = '<div class="muted">Hiç teklif yok</div>';
     }
 
-    // load subscription templates (only saleable ones). User subscriptions are shown only in inventory.
     async function loadSubscriptions(){
       const user = auth.currentUser;
       subsList.innerHTML = user ? 'Yükleniyor...' : '<div class="muted">Görmek için giriş yap</div>';
       if(!user) return;
       const snap = await getDocs(collection(db,'subscriptions'));
       subsList.innerHTML = '';
-      snap.forEach(s=>{
-        const d = s.data(), id = s.id;
-        // show only saleable templates (active !== false)
-        if(d.active === false) return;
-        const desc = d.desc ? `<div class="muted small">${d.desc}</div>` : '';
-        const inter = d.interval || 'custom';
-        subsList.innerHTML += `<div class="list-item"><div><div style="font-weight:700">${d.title}</div>${desc}<div class="small muted">${fmtReward(d.reward) || '—'} • ${intervalLabel(inter)}</div></div><div style="text-align:right"><div class="badge">${d.price} ₺</div><div style="margin-top:8px"><button onclick="startPurchase('sub','${id}')">Abone Ol</button></div></div></div>`;
-      });
+      snap.forEach(s=>{ const d = s.data(), id = s.id; if(d.active === false) return; const desc = d.desc ? `<div class="muted small">${d.desc}</div>` : ''; const inter = d.interval || 'custom'; subsList.innerHTML += `<div class="list-item"><div><div style="font-weight:700">${d.title}</div>${desc}<div class="small muted">${fmtReward(d.reward) || '—'} • ${intervalLabel(inter)}</div></div><div style="text-align:right"><div class="badge">${d.price} ₺</div><div style="margin-top:8px"><button onclick="startPurchase('sub','${id}')">Abone Ol</button></div></div></div>`; });
       if(subsList.innerHTML==='') subsList.innerHTML = '<div class="muted">Hiç abonelik yok</div>';
-
-      // NOTE: user subscriptions are intentionally NOT populated here (they are shown only in inventory).
     }
 
     async function loadAll(){ await Promise.all([loadPackages(), loadOffers(), loadSubscriptions()]); }
 
-    // PURCHASE FLOW WITH VERIFICATION (unchanged)
+    // PURCHASE FLOW WITH VERIFICATION
     function startPurchase(type,id){
       const a = Math.floor(Math.random()*9)+1;
       const b = Math.floor(Math.random()*9)+1;
@@ -693,7 +584,7 @@
       else if(p.type==='sub'){ await subscribeTemplate(p.id, user.uid); }
     }
 
-    // purchase handlers (unchanged)
+    // PURCHASE HANDLERS (with purchases logging)
     async function purchasePackage(pkgId, uid){
       const pkgRef = doc(db,'packages',pkgId), userRef = doc(db,'users',uid);
       try {
@@ -709,6 +600,22 @@
           tx.update(userRef, { balance: (u.balance||0) - (pkg.price||0), inventory: newInv });
           if(typeof pkg.stock==='number') tx.update(pkgRef, { stock: pkg.stock - 1 });
         });
+
+        // log purchase
+        try {
+          const pkgSnap2 = await getDoc(pkgRef);
+          const pkgData = pkgSnap2.exists() ? pkgSnap2.data() : {};
+          await addDoc(collection(db,'purchases'), {
+            userId: uid,
+            type: 'package',
+            itemId: pkgId,
+            title: pkgData.title || null,
+            price: Number(pkgData.price || 0),
+            rewards: pkgData.rewards || [],
+            createdAt: serverTimestamp()
+          });
+        } catch(e){ console.warn('purchase log write failed', e); }
+
         toast('Satın alındı! Ödül envanterine eklendi.');
         loadAll();
       } catch(e){ console.error(e); toast('Satın alma hatası: ' + (e.message||e)); }
@@ -727,33 +634,39 @@
           tx.update(userRef, { balance: (u.balance||0) - (off.price||0), inventory: newInv });
           if(typeof off.stock==='number') tx.update(offerRef, { stock: off.stock - 1 });
         });
+
+        try {
+          const offSnap2 = await getDoc(offerRef);
+          const offData = offSnap2.exists() ? offSnap2.data() : {};
+          await addDoc(collection(db,'purchases'), {
+            userId: uid,
+            type: 'offer',
+            itemId: offerId,
+            title: offData.title || null,
+            price: Number(offData.price || 0),
+            rewards: offData.rewards || [],
+            createdAt: serverTimestamp()
+          });
+        } catch(e){ console.warn('purchase log write failed', e); }
+
         toast('Teklif satın alındı! Ödüller envanterine eklendi.');
         loadAll();
       } catch(e){ console.error(e); toast('Satın alma hatası: ' + (e.message||e)); }
     }
 
-    // ------------------ NEW: SUBSCRIBE WITH CHARGE (değiştirildi) ------------------
-    // Kullanıcı abonelik alırken: bakiye kontrolü, ilk ödeme çekimi ve ilk ödül envantere eklenir.
+    // SUBSCRIPTIONS (unchanged behavior) with logging
     async function subscribeTemplate(subId, uid){
       try {
         const subRef = doc(db,'subscriptions',subId);
         const subSnap = await getDoc(subRef); if(!subSnap.exists()) throw new Error('Abonelik bulunamadı');
         const sub = subSnap.data();
-
-        // check template active flag (only saleable if active !== false)
         if(sub.active === false) { toast('Bu abonelik satışta değil'); return; }
 
-        // check duplicate active subscription (aynı şablon)
         const existing = await getDocs(query(collection(db,`users/${uid}/subscriptions`), where('templateId','==',subId)));
-        // if any active subscription with same template exists - prevent duplicate (user can have only one)
         let hasActive = false;
-        existing.forEach(docSnap => {
-          const data = docSnap.data();
-          if(data && data.status === 'active') hasActive = true;
-        });
+        existing.forEach(docSnap => { const data = docSnap.data(); if(data && data.status === 'active') hasActive = true; });
         if(hasActive){ toast('Zaten bu aboneliğe sahipsiniz'); return; }
 
-        // attempt charge and give first reward in transaction
         await runTransaction(db, async (tx)=>{
           const uRef = doc(db,'users',uid);
           const uSnap = await tx.get(uRef);
@@ -766,16 +679,26 @@
           tx.update(uRef, { balance: (userData.balance || 0) - price, inventory: inv });
         });
 
-        // create subscription doc for user (not in transaction)
         const interval = sub.interval || 'daily';
         let addMs = 24*3600*1000;
-        if(interval === 'daily') addMs = 24*3600*1000;
-        else if(interval === 'weekly') addMs = 7*24*3600*1000;
+        if(interval === 'weekly') addMs = 7*24*3600*1000;
         else if(interval === 'custom') addMs = (Number(sub.customDays||1))*24*3600*1000;
         await addDoc(collection(db,`users/${uid}/subscriptions`), {
           templateId: subId, title: sub.title, price: sub.price, interval: sub.interval, reward: sub.reward,
           status:'active', createdAt: serverTimestamp(), nextRewardAt: Date.now() + addMs, lastChargedAt: Date.now()
         });
+
+        try {
+          await addDoc(collection(db,'purchases'), {
+            userId: uid,
+            type: 'subscription',
+            itemId: subId,
+            title: sub.title || null,
+            price: Number(sub.price || 0),
+            rewards: sub.reward ? [sub.reward] : [],
+            createdAt: serverTimestamp()
+          });
+        } catch(e){ console.warn('purchase log write failed', e); }
 
         toast('Abonelik alındı — ilk ödeme çekildi ve ilk ödül envantere eklendi.');
         await loadAll();
@@ -786,7 +709,6 @@
       }
     }
 
-    // ------------------ NEW: USER CAN CANCEL THEIR SUBSCRIPTION (DELETE) ------------------
     async function userCancelSubscription(subDocId){
       const user = auth.currentUser; if(!user){ toast('Önce giriş'); location.hash='#login'; return; }
       if(!confirm('Aboneliği iptal etmek istediğine emin misin?')) return;
@@ -797,7 +719,7 @@
       } catch(e){ console.error(e); toast('İptal hatası: ' + (e.message||e)); }
     }
 
-    // ------------------ NEW ADMIN ACTION: Tetikle (kullanıcının tek bir aboneliğini çalıştır) ------------------
+    // ADMIN: trigger user subscription (keeps log)
     async function adminTriggerUserSubscription(uid, subDocId){
       const adminUser = auth.currentUser; if(!adminUser){ toast('Önce giriş'); return; }
       const admin = await isAdminUid(adminUser.uid); if(!admin){ toast('Admin yetkin yok'); return; }
@@ -813,56 +735,83 @@
           const price = Number(sData.price || 0);
           const inv = Array.isArray(u.inventory)? u.inventory.slice() : [];
           if(sData.reward) inv.push(sData.reward);
-          // deduct price (allow negative balances)
           tx.update(userRef, { balance: (u.balance || 0) - price, inventory: inv });
-          // advance nextRewardAt (always set)
           const interval = sData.interval || 'daily';
           let addMs = 24*3600*1000;
-          if(interval === 'daily') addMs = 24*3600*1000;
-          else if(interval === 'weekly') addMs = 7*24*3600*1000;
+          if(interval === 'weekly') addMs = 7*24*3600*1000;
           else if(interval === 'custom') addMs = (Number(sData.customDays||1))*24*3600*1000;
           const newNext = (Number(sData.nextRewardAt) || Date.now()) + addMs;
           tx.update(subRef, { nextRewardAt: newNext, lastChargedAt: Date.now(), status: 'active' });
         });
-        toast('Abonelik tetiklendi — ücret çekildi ve ödül verildi.');
-        if(userDetailModal.style.display === 'flex') openUserDetailModal(uid);
-      } catch(e){ console.error(e); toast('Tetikle hatası: ' + (e.message||e)); }
-    }
 
-    // ------------------ NEW: Admin edit offer (ekleme) ------------------
+        try {
+          const sdSnap = await getDoc(doc(db,`users/${uid}/subscriptions/${subDocId}`));
+          const sd = sdSnap.exists()? sdSnap.data() : {};
+          await addDoc(collection(db,'purchases'), {
+            userId: uid,
+            type: 'subscription',
+            itemId: sd.templateId || subDocId,
+            title: sd.title || null,
+            price: Number(sd.price || 0),
+            rewards: sd.reward ? [sd.reward] : [],
+            adminTriggered: true,
+            createdAt: serverTimestamp()
+          });
+        } catch(e){ console.warn('purchase log write failed', e); }
+
+        toast('Abonelik tetiklendi — ücret çekildi ve ödül verildi.');
+      } catch(e){
+        console.error('adminTriggerUserSubscription error', e);
+        toast('Tetikle hatası: ' + (e.message||e));
+      }
+    }
+    window.adminTriggerUserSubscription = adminTriggerUserSubscription;
+
+    // ADMIN: edit offer (load into form & update)
     window.adminEditOffer = async function(id){
-      const d = await getDoc(doc(db,'offers',id));
-      if(!d.exists()) return;
-      const data = d.data();
-      offerTitle.value = data.title||''; offerPrice.value = data.price||''; offerRewards.value = JSON.stringify(data.rewards||[]); offerStock.value = data.stock||''; offerExpires.value = data.expiresAt||''; offerDesc.value = data.desc||'';
-      btnAddOffer.classList.add('hidden'); btnUpdateOffer.classList.remove('hidden');
-      btnUpdateOffer.onclick = async ()=>{
-        let rewards = [];
-        try { rewards = offerRewards.value ? JSON.parse(offerRewards.value) : []; } catch(e){ rewards = parseRewardInput(offerRewards.value); }
-        await updateDoc(doc(db,'offers',id), { title: offerTitle.value, price: Number(offerPrice.value)||0, rewards, stock: Number(offerStock.value)||0, expiresAt: offerExpires.value||null, desc: offerDesc.value||'' });
-        toast('Teklif güncellendi'); offerTitle.value=''; offerPrice.value=''; offerRewards.value=''; offerStock.value=''; offerExpires.value=''; offerDesc.value=''; btnAddOffer.classList.remove('hidden'); btnUpdateOffer.classList.add('hidden');
-        loadAll(); loadAdminLists();
-      };
+      try {
+        const d = await getDoc(doc(db,'offers',id));
+        if(!d.exists()) { toast('Teklif bulunamadı'); return; }
+        const data = d.data();
+        offerTitle.value = data.title||'';
+        offerPrice.value = data.price||'';
+        offerRewards.value = JSON.stringify(data.rewards||[]);
+        offerStock.value = data.stock||'';
+        offerExpires.value = data.expiresAt||'';
+        offerDesc.value = data.desc||'';
+        btnAddOffer.classList.add('hidden');
+        btnUpdateOffer.classList.remove('hidden');
+        btnUpdateOffer.onclick = async ()=>{
+          let rewards = [];
+          try { rewards = offerRewards.value ? JSON.parse(offerRewards.value) : []; if(!Array.isArray(rewards)) rewards = [rewards]; } catch(e){ rewards = parseRewardInput(offerRewards.value); }
+          await updateDoc(doc(db,'offers',id), { title: offerTitle.value, price: Number(offerPrice.value)||0, rewards, stock: Number(offerStock.value)||0, expiresAt: offerExpires.value||null, desc: offerDesc.value||'' });
+          toast('Teklif güncellendi');
+          // reset form
+          offerTitle.value=''; offerPrice.value=''; offerRewards.value=''; offerStock.value=''; offerExpires.value=''; offerDesc.value='';
+          btnAddOffer.classList.remove('hidden');
+          btnUpdateOffer.classList.add('hidden');
+          btnUpdateOffer.onclick = null;
+          await loadAll();
+          await loadAdminLists();
+        };
+      } catch(e){ console.error('adminEditOffer error', e); toast('Teklif düzenleme hatası'); }
     };
 
-    // ------------------ ADMIN: Kullanıcı detay görüntüleme (envanter + abonelikler) (güncellendi) ------------------
+    // ADMIN: listing, user detail, purchase history
     async function openUserDetailModal(uid){
       const user = auth.currentUser; if(!user) { toast('Önce giriş yap'); return; }
       const admin = await isAdminUid(user.uid); if(!admin) { toast('Admin yetkin yok'); return; }
       const uSnap = await getDoc(doc(db,'users',uid));
       if(!uSnap.exists()){ toast('Kullanıcı bulunamadı'); return; }
       const u = uSnap.data();
-      // load user's subscriptions
       const subsSnap = await getDocs(collection(db,`users/${uid}/subscriptions`));
       let subsHtml = '<div style="font-weight:700;margin-bottom:8px">Abonelikler</div>';
       if(subsSnap.empty) subsHtml += '<div class="muted small">Hiç abonelik yok</div>';
       subsSnap.forEach(ss=>{
         const sd = ss.data();
-        // show only existing docs (we delete on cancel), so no cancelled statuses
-        subsHtml += `<div style="padding:8px;border-radius:8px;margin-bottom:6px;background:rgba(0,0,0,0.02);display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700">${sd.title}</div><div class="small muted">Durum: ${sd.status || 'active'} • Sonraki: ${sd.nextRewardAt? new Date(sd.nextRewardAt).toLocaleDateString() + ' ' + new Date(sd.nextRewardAt).toLocaleTimeString() : '—'}</div></div><div style="display:flex;gap:6px"><button onclick="adminCancelUserSubscription('${uid}','${ss.id}')" class="danger-btn">İptal Et</button><button onclick="adminTriggerUserSubscription('${uid}','${ss.id}')" class="subtle">Tetikle</button></div></div>`;
+        subsHtml += `<div style="padding:8px;border-radius:8px;margin-bottom:6px;background:rgba(0,0,0,0.02);display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700">${sd.title}</div><div class="small muted">Durum: ${sd.status || 'active'} • Sonraki: ${sd.nextRewardAt? new Date(sd.nextRewardAt).toLocaleString() : '—'}</div></div><div style="display:flex;gap:6px"><button onclick="adminCancelUserSubscription('${uid}','${ss.id}')" class="danger-btn">İptal Et</button><button onclick="adminTriggerUserSubscription('${uid}','${ss.id}')" class="subtle">Tetikle</button></div></div>`;
       });
 
-      // envanter
       let invHtml = '<div style="font-weight:700;margin-bottom:8px">Envanter</div>';
       const inv = Array.isArray(u.inventory)? u.inventory : [];
       if(inv.length === 0) invHtml += '<div class="muted small">Boş</div>';
@@ -870,21 +819,32 @@
         invHtml += `<div style="padding:8px;border-radius:8px;margin-bottom:6px;background:rgba(0,0,0,0.02);display:flex;justify-content:space-between;align-items:center"><div>${fmtReward(it) || JSON.stringify(it)}</div><div style="display:flex;gap:6px"><button onclick="adminRemoveUserItem('${uid}',${idx})" class="danger-btn">Kaldır</button></div></div>`;
       });
 
-      // basic info & actions
+      // purchases of this user
+      let purchasesHtml = '<div style="font-weight:700;margin-bottom:8px">Satın Alma Geçmişi</div>';
+      try {
+        const q = query(collection(db,'purchases'), where('userId','==',uid), orderBy('createdAt','desc'));
+        const pSnap = await getDocs(q);
+        if(pSnap.empty) purchasesHtml += '<div class="muted small">Hiç satın alma kaydı yok</div>';
+        else {
+          pSnap.forEach(p=> {
+            const pd = p.data();
+            const dateStr = pd.createdAt && pd.createdAt.toDate ? pd.createdAt.toDate().toLocaleString() : (pd.createdAt? new Date(pd.createdAt).toLocaleString() : '—');
+            purchasesHtml += `<div style="padding:8px;border-radius:8px;margin-bottom:6px;background:rgba(0,0,0,0.02)"><div style="font-weight:700">${pd.title || pd.itemId || pd.type}</div><div class="small muted">${pd.type} • ${pd.price || 0}₺ • ${dateStr}</div></div>`;
+          });
+        }
+      } catch(e){ console.warn('user purchases load failed', e); purchasesHtml += '<div class="muted small">Satın alma geçmişi yüklenemedi</div>'; }
+
       const infoHtml = `<div style="font-weight:700;margin-bottom:8px">Kullanıcı: ${u.displayName||u.username || uid}</div>
         <div class="small muted">Bakiye: ${u.balance||0} ₺ • UID: ${uid}</div>
         <div style="margin-top:8px"><button onclick="adminForceSetBalancePrompt('${uid}')" class="subtle">Bakiye Ayarla</button></div>`;
 
-      userDetailBody.innerHTML = `<div style="display:grid;grid-template-columns:1fr;gap:12px">${infoHtml}${subsHtml}${invHtml}</div>`;
+      userDetailBody.innerHTML = `<div style="display:grid;grid-template-columns:1fr;gap:12px">${infoHtml}${subsHtml}${invHtml}${purchasesHtml}</div>`;
       userDetailModal.style.display = 'flex';
     }
-
     userDetailClose.onclick = ()=> { userDetailModal.style.display = 'none'; userDetailBody.innerHTML = ''; };
 
-    // admin remove user's inventory item
     async function adminRemoveUserItem(uid, index){
-      const confirmDel = confirm('Bu öğeyi kullanıcıdan kaldırmak istediğine emin misin?');
-      if(!confirmDel) return;
+      if(!confirm('Bu öğeyi kullanıcıdan kaldırmak istediğine emin misin?')) return;
       try {
         await runTransaction(db, async (tx)=>{
           const uRef = doc(db,'users',uid);
@@ -901,14 +861,12 @@
       } catch(e){ console.error(e); toast('Kaldırma hatası: ' + (e.message||e)); }
     }
 
-    // admin cancel user's subscription document -> DELETE instead of marking cancelled
     async function adminCancelUserSubscription(uid, subDocId){
       if(!confirm('Aboneliği iptal etmek istediğine emin misin?')) return;
       try {
         await deleteDoc(doc(db,`users/${uid}/subscriptions/${subDocId}`));
         toast('Abonelik silindi (iptal edildi).');
         if(userDetailModal.style.display === 'flex') openUserDetailModal(uid);
-        // refresh admin users list
         loadAdminUsersList();
       } catch(e){ console.error(e); toast('İptal hatası: ' + (e.message||e)); }
     }
@@ -924,7 +882,7 @@
       loadAdminUsersList();
     }
 
-    // ------------------ ADMIN USERS LIST and CRUDs ------------------
+    // admin lists + purchase history (global shows who bought what)
     async function loadAdminLists(){
       const user = auth.currentUser; if(!user) return;
       const admin = await isAdminUid(user.uid); if(!admin) return;
@@ -935,16 +893,8 @@
         const d = s.data(), id = s.id;
         let expiresParts = [];
         if(d.durationDays) expiresParts.push(`${d.durationDays} gün`);
-        if(d.expiresAtTs){
-          const days = daysRemainingFromTs(d.expiresAtTs);
-          expiresParts.push(days > 0 ? `${days} gün kaldı` : 'süresi doldu');
-        } else if(d.expiresAt){
-          const ts = parseDateToTs(d.expiresAt);
-          if(ts){
-            const days = daysRemainingFromTs(ts);
-            expiresParts.push(days > 0 ? `${days} gün kaldı` : 'süresi doldu');
-          }
-        }
+        if(d.expiresAtTs){ const days = daysRemainingFromTs(d.expiresAtTs); expiresParts.push(days > 0 ? `${days} gün kaldı` : 'süresi doldu'); }
+        else if(d.expiresAt){ const ts = parseDateToTs(d.expiresAt); if(ts){ const days = daysRemainingFromTs(ts); expiresParts.push(days > 0 ? `${days} gün kaldı` : 'süresi doldu'); } }
         const expiresLabel = expiresParts.length ? ` • ${expiresParts.join(' • ')}` : '';
         html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;margin-bottom:6px;background:rgba(0,0,0,0.02)"><div><div style="font-weight:700">${d.title}</div><div class="small muted">${formatRewards(d.rewards)} • ${d.price}₺${expiresLabel} • stok: ${d.stock}</div></div><div style="display:flex;gap:6px"><button onclick="adminDeletePkg('${id}')" class="danger-btn">Sil</button></div></div>`;
       });
@@ -962,7 +912,6 @@
       html += '<div style="font-weight:700;margin-bottom:8px">Mevcut Abonelik Şablonları</div>';
       sbSnap.forEach(s=>{
         const d = s.data(), id = s.id;
-        // only show saleable templates (active !== false)
         if(d.active === false) return;
         html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;margin-bottom:6px;background:rgba(0,0,0,0.02)"><div><div style="font-weight:700">${d.title}</div><div class="small muted">${fmtReward(d.reward) || '—'} • ${intervalLabel(d.interval)} • ${d.price}₺</div></div><div style="display:flex;gap:6px"><button onclick="adminDeleteSub('${id}')" class="danger-btn">Sil</button></div></div>`;
       });
@@ -973,11 +922,10 @@
       container.id = 'admin-listing-area';
       adminPage.appendChild(container);
 
-      // populate bottom edit select
       await populateAdminPackageSelect();
+      await loadPurchaseHistoryGlobal();
     }
 
-    // populate admin-edit-pkg-select with packages
     async function populateAdminPackageSelect(){
       try {
         const sel = adminEditPkgSelect;
@@ -993,19 +941,20 @@
       } catch(e){ console.error(e); }
     }
 
-    // admin users listing with "görüntüle" button
     async function loadAdminUsersList(){
-      const user = auth.currentUser;
-      if(!user) return;
-      const admin = await isAdminUid(user.uid);
-      if(!admin){ adminUsersList.textContent = 'Yönetici değilsiniz'; return; }
-      const snap = await getDocs(query(collection(db,'users'), orderBy('createdAt')));
-      let html = '';
-      snap.forEach(s=>{
-        const d = s.data(), id = s.id;
-        html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;margin-bottom:6px;background:rgba(0,0,0,0.02)"><div><div style="font-weight:700">${d.displayName||d.username}</div><div class="small muted">Bakiye: ${d.balance||0} ₺ • UID: ${id}</div></div><div style="display:flex;gap:6px"><button onclick="openUserDetailModal('${id}')" class="subtle">Görüntüle</button><button onclick="promptSetBalance('${id}','${d.username||''}')" class="subtle">Bakiye</button></div></div>`;
-      });
-      adminUsersList.innerHTML = html || '<div class="muted small">Hiç kullanıcı yok</div>';
+      try {
+        const user = auth.currentUser;
+        if(!user) { adminUsersList.textContent = 'Giriş yapın'; return; }
+        const admin = await isAdminUid(user.uid);
+        if(!admin){ adminUsersList.textContent = 'Yönetici değilsiniz'; return; }
+        const snap = await getDocs(query(collection(db,'users'), orderBy('createdAt')));
+        let html = '';
+        snap.forEach(s=>{
+          const d = s.data(), id = s.id;
+          html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;margin-bottom:6px;background:rgba(0,0,0,0.02)"><div><div style="font-weight:700">${d.displayName||d.username}</div><div class="small muted">Bakiye: ${d.balance||0} ₺ • UID: ${id}</div></div><div style="display:flex;gap:6px"><button onclick="openUserDetailModal('${id}')" class="subtle">Görüntüle</button><button onclick="promptSetBalance('${id}','${d.username||''}')" class="subtle">Bakiye</button></div></div>`;
+        });
+        adminUsersList.innerHTML = html || '<div class="muted small">Hiç kullanıcı yok</div>';
+      } catch(e){ console.error(e); adminUsersList.innerHTML = 'Yükleme hatası'; }
     }
 
     window.promptSetBalance = async function(uid,username){
@@ -1018,7 +967,6 @@
       loadAdminUsersList();
     };
 
-    // admin delete functions (unchanged)
     window.adminDeletePkg = async function(id){
       if(!confirm('Paketi silmek istediğine emin misin?')) return;
       await deleteDoc(doc(db,'packages',id));
@@ -1033,23 +981,15 @@
       await deleteDoc(doc(db,'subscriptions',id)); toast('Abonelik şablonu silindi'); loadAll(); loadAdminLists();
     };
 
-    // add new items (paket ve abonelik için ödül ayrıştırıldı)
+    // Add handlers
     btnAddPkg.addEventListener('click', async ()=>{
       const title = (pkgTitle.value||'').trim(); const price = Number(pkgPrice.value)||0; const amountRaw = (pkgAmount.value||'').trim(); const stock = Number(pkgStock.value)||0; const duration = pkgDuration.value?Number(pkgDuration.value):null; const expiresRaw = (pkgExpires.value||'').trim(); const desc = pkgDesc.value||'';
       if(!title) { toast('Başlık gerekli'); return; }
       const rewards = parseRewardInput(amountRaw);
       const obj = { title, price, rewards, stock, durationDays: duration, desc, active:true, createdAt: serverTimestamp() };
-      if(expiresRaw){
-        const ts = parseDateToTs(expiresRaw);
-        if(ts){ obj.expiresAt = expiresRaw; obj.expiresAtTs = ts; }
-      }
+      if(expiresRaw){ const ts = parseDateToTs(expiresRaw); if(ts){ obj.expiresAt = expiresRaw; obj.expiresAtTs = ts; } }
       await addDoc(collection(db,'packages'), obj);
-      if(obj.expiresAtTs){
-        const days = daysRemainingFromTs(obj.expiresAtTs);
-        toast(`Paket eklendi. Son kullanma: ${days>0? days + ' gün kaldı' : 'süresi doldu'}`);
-      } else {
-        toast('Paket eklendi');
-      }
+      toast('Paket eklendi');
       pkgTitle.value=''; pkgPrice.value=''; pkgAmount.value=''; pkgStock.value=''; pkgDuration.value=''; pkgExpires.value=''; pkgDesc.value='';
       await loadAll(); await loadAdminLists();
     });
@@ -1057,19 +997,10 @@
     btnAddOffer.addEventListener('click', async ()=>{
       const title = (offerTitle.value||'').trim(); const price = Number(offerPrice.value)||0; const stock = Number(offerStock.value)||0; const expires = (offerExpires.value||'').trim(); const desc = offerDesc.value||'';
       let rewards = [];
-      // tolerant parsing: try JSON, otherwise parseRewardInput
-      try {
-        rewards = offerRewards.value ? JSON.parse(offerRewards.value) : [];
-        if(!Array.isArray(rewards)) rewards = [rewards];
-      } catch(e){
-        rewards = parseRewardInput(offerRewards.value);
-      }
+      try { rewards = offerRewards.value ? JSON.parse(offerRewards.value) : []; if(!Array.isArray(rewards)) rewards = [rewards]; } catch(e){ rewards = parseRewardInput(offerRewards.value); }
       if(!title){ toast('Başlık gerekli'); return; }
       const obj = { title, price, rewards, stock, active:true, expiresAt: expires||null, createdAt: serverTimestamp(), desc };
-      if(expires){
-        const ts = parseDateToTs(expires);
-        if(ts) obj.expiresAtTs = ts;
-      }
+      if(expires){ const ts = parseDateToTs(expires); if(ts) obj.expiresAtTs = ts; }
       await addDoc(collection(db,'offers'), obj);
       toast('Teklif eklendi');
       offerTitle.value=''; offerPrice.value=''; offerRewards.value=''; offerStock.value=''; offerExpires.value=''; offerDesc.value='';
@@ -1084,17 +1015,17 @@
       const obj = { title, price, interval, reward, active:true, createdAt: serverTimestamp(), desc };
       if(interval==='custom' && customDays) obj.customDays = customDays;
       await addDoc(collection(db,'subscriptions'), obj);
-      toast('Abonelik eklendi'); subTitle.value=''; subPrice.value=''; subCustomDays.value=''; subAmount.value=''; subDesc.value=''; loadAll(); loadAdminLists();
+      toast('Abonelik eklendi');
+      subTitle.value=''; subPrice.value=''; subCustomDays.value=''; subAmount.value=''; subDesc.value=''; loadAll(); loadAdminLists();
     });
 
-    // UTIL: when entering admin page, load lists
+    // admin page hash behavior
     window.addEventListener('hashchange', async ()=>{
       if(location.hash === '#admin'){
         const user = auth.currentUser;
         if(!user) { toast('Önce giriş yap'); location.hash = '#login'; return; }
         const admin = await isAdminUid(user.uid);
         if(!admin) { toast('Admin değilsiniz'); location.hash = '#store'; return; }
-        // ensure add buttons visible, update buttons hidden by default
         try {
           btnAddPkg && btnAddPkg.classList.remove('hidden');
           btnAddOffer && btnAddOffer.classList.remove('hidden');
@@ -1110,7 +1041,7 @@
       if(location.hash === '#inventory') showInventory();
     });
 
-    // ------------------ BOTTOM PANEL: paket seç ve forma yükle (düzenleme) ------------------
+    // admin edit pack action (bottom panel)
     adminEditPkgLoad.addEventListener('click', async ()=>{
       const pkgId = adminEditPkgSelect.value;
       if(!pkgId){ toast('Önce bir paket seç'); return; }
@@ -1136,18 +1067,10 @@
           if(!title){ toast('Başlık gerekli'); return; }
           const rewards = parseRewardInput(amountRaw);
           const updateObj = { title, price, rewards, stock, durationDays: duration, desc };
-          if(expiresRaw){
-            const ts = parseDateToTs(expiresRaw);
-            if(ts){ updateObj.expiresAt = expiresRaw; updateObj.expiresAtTs = ts; }
-            else { updateObj.expiresAt = expiresRaw; updateObj.expiresAtTs = null; }
-          } else { updateObj.expiresAt = null; updateObj.expiresAtTs = null; }
+          if(expiresRaw){ const ts = parseDateToTs(expiresRaw); if(ts){ updateObj.expiresAt = expiresRaw; updateObj.expiresAtTs = ts; } else { updateObj.expiresAt = expiresRaw; updateObj.expiresAtTs = null; } }
+          else { updateObj.expiresAt = null; updateObj.expiresAtTs = null; }
           await updateDoc(doc(db,'packages',pkgId), updateObj);
-          if(updateObj.expiresAtTs){
-            const days = daysRemainingFromTs(updateObj.expiresAtTs);
-            toast(`Paket güncellendi. Son kullanma: ${days>0? days + ' gün kaldı' : 'süresi doldu'}`);
-          } else {
-            toast('Paket güncellendi.');
-          }
+          toast('Paket güncellendi.');
           btnUpdatePkg.classList.add('hidden');
           btnUpdatePkg.onclick = null;
           pkgTitle.value=''; pkgPrice.value=''; pkgAmount.value=''; pkgStock.value=''; pkgDuration.value=''; pkgExpires.value=''; pkgDesc.value='';
@@ -1156,21 +1079,7 @@
       } catch(e){ console.error(e); toast('Yükleme hatası'); }
     });
 
-    // initial: make sure update buttons hidden and add visible (defensive)
-    try {
-      btnAddPkg && btnAddPkg.classList.remove('hidden');
-      btnAddOffer && btnAddOffer.classList.remove('hidden');
-      btnAddSub && btnAddSub.classList.remove('hidden');
-      btnUpdatePkg && btnUpdatePkg.classList.add('hidden');
-      btnUpdateOffer && btnUpdateOffer.classList.add('hidden');
-      btnUpdateSub && btnUpdateSub.classList.add('hidden');
-    } catch(e){}
-
-    // initial load
-    loadAll();
-    setInterval(()=>{ if(auth.currentUser) { loadAdminUsersList(); populateAdminPackageSelect(); } }, 30_000);
-
-    // ------------------ UPDATED: showInventory (artık envanter + abonelik iptal içerir) ------------------
+    // inventory + show
     async function showInventory(){
       const user = auth.currentUser; if(!user){ toast('Önce giriş'); location.hash='#login'; return; }
       const s = await getDoc(doc(db,'users',user.uid)); const d = s.exists()? s.data() : {};
@@ -1187,19 +1096,18 @@
         il.innerHTML += `<div style="padding:8px;border-radius:8px;margin-top:6px;background:rgba(0,0,0,0.02);display:flex;justify-content:space-between;align-items:center"><div>${fmtReward(it) || JSON.stringify(it)}</div><div style="display:flex;gap:6px"><button onclick="useInventoryItem(${idx})" class="ok-btn">Kullan</button></div></div>`;
       });
 
-      // --- Abonelikleri de göster ve "İptal Et" butonu ekle (iptal -> silme) ---
+      // subscriptions
       const subsContainer = $('inv-subs');
       subsContainer.innerHTML = 'Yükleniyor...';
       const userSubsSnap = await getDocs(collection(db,`users/${user.uid}/subscriptions`));
-      if(userSubsSnap.empty) {
-        subsContainer.innerHTML = '<div class="muted">Aktif aboneliğiniz yok</div>';
-      } else {
+      if(userSubsSnap.empty) { subsContainer.innerHTML = '<div class="muted">Aktif aboneliğiniz yok</div>'; }
+      else {
         subsContainer.innerHTML = '';
         userSubsSnap.forEach(ss=>{
           const sd = ss.data();
           const id = ss.id;
           subsContainer.innerHTML += `<div style="padding:8px;border-radius:8px;margin-top:6px;background:rgba(0,0,0,0.02);display:flex;justify-content:space-between;align-items:center">
-            <div><div style="font-weight:700">${sd.title}</div><div class="small muted">Durum: ${sd.status || 'active'} • Sonraki: ${sd.nextRewardAt? new Date(sd.nextRewardAt).toLocaleDateString() + ' ' + new Date(sd.nextRewardAt).toLocaleTimeString() : '—'}</div></div>
+            <div><div style="font-weight:700">${sd.title}</div><div class="small muted">Durum: ${sd.status || 'active'} • Sonraki: ${sd.nextRewardAt? new Date(sd.nextRewardAt).toLocaleString() : '—'}</div></div>
             <div style="display:flex;gap:6px">
               <button onclick="userCancelSubscription('${id}')" class="danger-btn">İptal Et</button>
             </div>
@@ -1210,8 +1118,7 @@
       location.hash = '#inventory';
     }
 
-    // Use inventory item by index -> remove that index element in transaction and perform "use" action
-    async function useInventoryItem(index){
+    window.useInventoryItem = async function(index){
       const user = auth.currentUser; if(!user){ toast('Önce giriş'); location.hash='#login'; return; }
       try {
         await runTransaction(db, async (tx)=>{
@@ -1221,17 +1128,15 @@
           const u = uSnap.data();
           const inv = Array.isArray(u.inventory)? u.inventory.slice() : [];
           if(index < 0 || index >= inv.length) throw new Error('Öğe bulunamadı');
-          const item = inv.splice(index,1)[0];
-          // burada "kullanma" mantığını yerine getir: örnek olarak sadece envanterden siliniyor.
+          inv.splice(index,1);
           tx.update(uRef, { inventory: inv });
         });
         toast('Öğe kullanıldı ve envanterden kaldırıldı.');
         showInventory();
       } catch(e){ console.error(e); toast('Kullanma hatası: ' + (e.message||e)); }
-    }
+    };
 
-    // ------------------ NEW: SUBSCRIPTION PROCESSING ------------------
-    // Bu fonksiyon, bir kullanıcının aktif aboneliklerini kontrol eder; eğer nextRewardAt <= now => ücret al ve ödül ver.
+    // process due subscriptions for a user (keeps purchases log)
     async function processDueSubscriptionsForUser(uid){
       try {
         const subsSnap = await getDocs(collection(db,`users/${uid}/subscriptions`));
@@ -1241,7 +1146,6 @@
           const nextAt = sd.nextRewardAt || 0;
           const now = Date.now();
           if(nextAt <= now){
-            // attempt to charge and give reward; use transaction on user and sub doc
             const userRef = doc(db,'users',uid);
             const subDocRef = doc(db,`users/${uid}/subscriptions/${s.id}`);
             await runTransaction(db, async (tx)=>{
@@ -1250,59 +1154,118 @@
               const userData = uSnap.data();
               const price = Number(sd.price || 0);
               if((userData.balance || 0) < price){
-                // not enough money -> mark past_due (kept as is)
                 tx.update(subDocRef, { status: 'past_due' });
                 return;
               }
-              // deduct price, add reward to inventory, advance nextRewardAt
               const inv = Array.isArray(userData.inventory)? userData.inventory.slice() : [];
               if(sd.reward) inv.push(sd.reward);
               const interval = sd.interval || 'daily';
-              let addMs = 24*3600*1000; // daily default
-              if(interval === 'daily') addMs = 24*3600*1000;
-              else if(interval === 'weekly') addMs = 7*24*3600*1000;
+              let addMs = 24*3600*1000;
+              if(interval === 'weekly') addMs = 7*24*3600*1000;
               else if(interval === 'custom') addMs = (Number(sd.customDays||1))*24*3600*1000;
               const newNext = (Number(sd.nextRewardAt) || Date.now()) + addMs;
               tx.update(userRef, { balance: (userData.balance || 0) - price, inventory: inv });
               tx.update(subDocRef, { nextRewardAt: newNext, lastChargedAt: Date.now() });
             });
+            // log automatic subscription purchase
+            try {
+              const sDoc = await getDoc(doc(db,`users/${uid}/subscriptions/${s.id}`));
+              const sDataLogged = sDoc.exists()? sDoc.data() : sd;
+              await addDoc(collection(db,'purchases'), {
+                userId: uid,
+                type: 'subscription',
+                itemId: sDataLogged.templateId || s.id,
+                title: sDataLogged.title || null,
+                price: Number(sDataLogged.price || 0),
+                rewards: sDataLogged.reward ? [sDataLogged.reward] : [],
+                createdAt: serverTimestamp(),
+                automated: true
+              });
+            } catch(e){ console.warn('subscription auto-purchase log failed', e); }
           }
         }
       } catch(e){ console.error('processDueSubscriptionsForUser error', e); }
     }
 
-    // Admin: run billing for all users
+    // admin run billing all users
     async function adminRunBillingAll(){
-      const user = auth.currentUser; if(!user) { toast('Önce giriş yap'); return; }
-      const admin = await isAdminUid(user.uid);
-      if(!admin) { toast('Admin yetkin yok'); return; }
+      const adminUser = auth.currentUser; if(!adminUser){ toast('Önce giriş'); return; }
+      const isAdmin = await isAdminUid(adminUser.uid); if(!isAdmin){ toast('Admin yetkin yok'); return; }
+      if(!confirm('Tüm kullanıcılar için vadesi gelmiş abonelikleri çalıştırmak istediğine emin misin?')) return;
       try {
-        toast('Abonelikler çalıştırılıyor. Bu işlem biraz sürebilir...');
-        const usersSnap = await getDocs(query(collection(db,'users'), orderBy('createdAt')));
-        for(const u of usersSnap.docs){
-          await processDueSubscriptionsForUser(u.id);
+        const usersSnap = await getDocs(collection(db,'users'));
+        const uids = [];
+        usersSnap.forEach(d=> uids.push(d.id));
+        for(const uid of uids){
+          await processDueSubscriptionsForUser(uid);
         }
-        toast('Abonelik çalıştırma tamamlandı.');
-        loadAll();
-        loadAdminUsersList();
-      } catch(e){ console.error(e); toast('Abonelik çalıştırma hatası'); }
+        toast('Tüm kullanıcılar için abonelik tetikleme tamamlandı.');
+      } catch(e){
+        console.error('adminRunBillingAll error', e);
+        toast('Toplu tetikleme hatası: ' + (e.message||e));
+      }
     }
     adminRunBillingBtn && (adminRunBillingBtn.onclick = adminRunBillingAll);
+    window.adminRunBillingAll = adminRunBillingAll;
 
-    // expose some functions for inline onclicks (ensure global assignments)
+    // PURCHASE HISTORY (global) — show who bought
+    async function loadPurchaseHistoryGlobal(){
+      try {
+        phList.innerHTML = 'Yükleniyor...';
+        const filter = phFilter.value || 'all';
+        let q;
+        if(filter === 'all') q = query(collection(db,'purchases'), orderBy('createdAt','desc'));
+        else q = query(collection(db,'purchases'), where('type','==',filter), orderBy('createdAt','desc'));
+        const snap = await getDocs(q);
+        if(snap.empty){ phList.innerHTML = '<div class="muted small">Hiç satın alma kaydı yok</div>'; return; }
+        let html = '';
+        for(const d of snap.docs){
+          const pd = d.data();
+          const dateStr = pd.createdAt && pd.createdAt.toDate ? pd.createdAt.toDate().toLocaleString() : (pd.createdAt? new Date(pd.createdAt).toLocaleString() : '—');
+          let userLabel = pd.userId || '—';
+          try {
+            if(pd.userId){
+              const uDoc = await getDoc(doc(db,'users',pd.userId));
+              if(uDoc.exists()){
+                const ud = uDoc.data();
+                userLabel = ud.displayName || ud.username || pd.userId;
+              }
+            }
+          } catch(e){ console.warn('user fetch failed', e); }
+          html += `<div style="padding:8px;border-radius:8px;margin-bottom:6px;background:rgba(0,0,0,0.02)"><div style="font-weight:700">${pd.title || pd.itemId || pd.type}</div><div class="small muted">${pd.type} • ${pd.price || 0}₺ • ${userLabel} • ${dateStr}</div></div>`;
+        }
+        phList.innerHTML = html;
+      } catch(e){ console.error(e); phList.innerHTML = '<div class="muted small">Satın alma geçmişi yüklenemedi</div>'; }
+    }
+
+    phRefresh.addEventListener('click', ()=> loadPurchaseHistoryGlobal());
+    phFilter.addEventListener('change', ()=> loadPurchaseHistoryGlobal());
+
+    // expose globals used by inline onclicks
     window.startPurchase = startPurchase;
     window.openUserDetailModal = openUserDetailModal;
-    window.adminRunBillingAll = adminRunBillingAll;
     window.useInventoryItem = useInventoryItem;
     window.adminRemoveUserItem = adminRemoveUserItem;
     window.adminCancelUserSubscription = adminCancelUserSubscription;
     window.adminForceSetBalancePrompt = adminForceSetBalancePrompt;
-    window.adminTriggerUserSubscription = adminTriggerUserSubscription;
-    window.adminEditOffer = adminEditOffer;
     window.userCancelSubscription = userCancelSubscription;
-    // ensure core functions are also available globally
     window.processDueSubscriptionsForUser = processDueSubscriptionsForUser;
     window.showInventory = showInventory;
+
+    // initial bootstrap
+    (async function init(){
+      try {
+        btnAddPkg && btnAddPkg.classList.remove('hidden');
+        btnAddOffer && btnAddOffer.classList.remove('hidden');
+        btnAddSub && btnAddSub.classList.remove('hidden');
+        btnUpdatePkg && btnUpdatePkg.classList.add('hidden');
+        btnUpdateOffer && btnUpdateOffer.classList.add('hidden');
+        btnUpdateSub && btnUpdateSub.classList.add('hidden');
+      } catch(e){}
+      await loadAll();
+      await loadAdminUsersList();
+      setInterval(()=>{ if(auth.currentUser) { loadAdminUsersList(); populateAdminPackageSelect(); } }, 30000);
+    })();
 
   </script>
 </body>
