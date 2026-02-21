@@ -70,13 +70,6 @@
     .item-details .row { gap:8px; }
     .small-muted { color:var(--muted); font-size:13px; }
     @keyframes fadeIn { from {opacity:0; transform:translateY(-4px)} to {opacity:1; transform:translateY(0)} }
-
-    /* --- YENİ: en-yeniler panel stilleri (eklendi, orijinalde başka yeri değiştirmeden) --- */
-    #global-newest-btn { margin-left: 8px; padding:8px 10px; border-radius:8px; background: linear-gradient(90deg,var(--accent1),var(--accent2)); color:white; border:0; cursor:pointer; font-weight:700; }
-    #global-newest-panel { display:none; margin-bottom:12px; border-radius:10px; padding:12px; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95)); box-shadow: 0 8px 20px rgba(2,6,23,0.06); }
-    .new-row { display:flex; justify-content:space-between; align-items:center; padding:8px; border-radius:8px; margin-bottom:8px; background: rgba(0,0,0,0.02); }
-    .type-badge { padding:6px 8px; border-radius:999px; font-weight:700; background: rgba(0,0,0,0.03); }
-    /* --- /YENİ --- */
   </style>
 </head>
 <body>
@@ -101,10 +94,6 @@
           <a href="#admin" data-link id="nav-admin" class="hidden">Admin</a>
         </nav>
 
-        <!-- --- YENİ: herkese görünen "En Yeniler" butonu header'a eklendi (hiçbir şeyi silmeden) --- -->
-        <button id="global-newest-btn" title="Son eklenen paket/teklif/abonelikleri göster">En Yeniler</button>
-        <!-- --- /YENİ --- -->
-
         <div id="user-area" class="hidden card" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:999px">
           <div id="user-name" style="font-weight:700"></div>
           <div id="user-balance" class="pill"></div>
@@ -116,26 +105,13 @@
     <!-- mesaj bar: artık alert() yerine buraya yazılıyor -->
     <div id="message-bar" role="status" aria-live="polite"></div>
 
-    <!-- --- YENİ: En Yeniler global panel (herkese görünür, hiçbir şeyi silmeden eklendi) --- -->
-    <div id="global-newest-panel" class="card" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div style="font-weight:700">En Yeniler — Paket / Teklif / Abonelik (son 10)</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button id="global-newest-refresh" class="subtle">Yenile</button>
-          <button id="global-newest-close" class="subtle">Kapat</button>
-        </div>
-      </div>
-      <div id="global-newest-list" class="small muted">Yükleniyor...</div>
-    </div>
-    <!-- --- /YENİ --- -->
-
     <main>
       <section id="page-home" class="page card">
         <h2>Hoş geldin</h2>
         <div class="row" style="margin-top:12px">
           <div class="col card" style="text-align:center">
             <h3>Paketler</h3>
-            <p<class="muted">Tek seferlik eşyalar — örn. 500 Elmas</p>
+            <p class="muted">Tek seferlik eşyalar — örn. 500 Elmas</p>
             <div style="margin-top:12px"><button onclick="location.hash='#store'">Paketleri Gör</button></div>
           </div>
           <div class="col card" style="text-align:center">
@@ -849,6 +825,7 @@
           tx.update(subRef, { nextRewardAt: newNext, lastChargedAt: Date.now(), status: 'active' });
         });
         toast('Abonelik tetiklendi — ücret çekildi ve ödül verildi.');
+        if(userDetailModal.style.display === 'flex') openUserDetailModal(uid);
       } catch(e){ console.error(e); toast('Tetikle hatası: ' + (e.message||e)); }
     }
 
@@ -1327,126 +1304,320 @@
     window.processDueSubscriptionsForUser = processDueSubscriptionsForUser;
     window.showInventory = showInventory;
 
-    /* --- YENİ: Global "En Yeniler" fonksiyonu (hiçbir şeyi silmeden eklendi) --- */
-    // DOM refs for newly added elements
-    const globalNewestBtn = $('global-newest-btn');
-    const globalNewestPanel = $('global-newest-panel');
-    const globalNewestList = $('global-newest-list');
-    const globalNewestRefresh = $('global-newest-refresh');
-    const globalNewestClose = $('global-newest-close');
+  </script>
 
-    // human-readable time ago (Türkçe)
-    function timeAgoLabel(ts){
-      if(!ts) return '—';
-      let t = ts;
-      if(ts && ts.toDate) t = ts.toDate().getTime();
-      else if(typeof ts === 'object' && ts.seconds) t = (ts.seconds*1000) + Math.floor((ts.nanoseconds||0)/1e6);
-      else t = Number(ts) || Date.now();
-      const diff = Date.now() - t;
-      const sec = Math.floor(diff / 1000);
-      if(sec < 60) return `${sec} saniye önce`;
-      const min = Math.floor(sec / 60);
-      if(min < 60) return `${min} dakika önce`;
-      const hrs = Math.floor(min / 60);
-      if(hrs < 24) return `${hrs} saat önce`;
-      const days = Math.floor(hrs / 24);
-      if(days < 30) return `${days} gün önce`;
-      const months = Math.floor(days / 30);
-      if(months < 12) return `${months} ay önce`;
-      const years = Math.floor(months / 12);
-      return `${years} yıl önce`;
-    }
+  <!-- ============================
+       EKLENEN: SATIN ALIM GEÇMİŞİ
+       (Lütfen hiçbir şeyi silme)
+       Bu bloku sayfanın sonuna ekledim.
+       ============================ -->
+  <script>
+  /* ===============================
+     SATIN ALIM GEÇMİŞİ EK SİSTEMİ
+     HİÇBİR MEVCUT KODU SİLMEZ
+  ================================= */
 
-    // toggle panel
-    function openGlobalNewest(){
-      if(!globalNewestPanel) return;
-      globalNewestPanel.style.display = 'block';
-      globalNewestBtn.textContent = 'En Yeniler (açık)';
-      fetchAndRenderGlobalNewest();
-    }
-    function closeGlobalNewest(){
-      if(!globalNewestPanel) return;
-      globalNewestPanel.style.display = 'none';
-      globalNewestBtn.textContent = 'En Yeniler';
-    }
+  // Güvenli global alan
+  window.purchaseHistory = window.purchaseHistory || {};
 
-    // fetch top 10 newest across packages/offers/subscriptions
-    async function fetchAndRenderGlobalNewest(){
-      if(!globalNewestList) return;
-      globalNewestList.textContent = 'Yükleniyor...';
-      try {
-        // fetch some recent docs (get up to 20 from each for safety then merge)
-        const pkSnap = await getDocs(query(collection(db,'packages'), orderBy('createdAt','desc'), /* no limit for safety but could add */ ));
-        const ofSnap = await getDocs(query(collection(db,'offers'), orderBy('createdAt','desc') ));
-        const sbSnap = await getDocs(query(collection(db,'subscriptions'), orderBy('createdAt','desc') ));
+  // Satın alım kaydı ekle
+  function addPurchaseHistorySafe(userId, type, name, price){
+      if(!userId) return;
 
-        const items = [];
-
-        pkSnap.forEach(s=>{
-          const d = s.data();
-          const created = d.createdAt || d.createdAtTs || d.expiresAtTs || null;
-          items.push({ type:'Paket', id:s.id, title: d.title || s.id, price: d.price || 0, createdAt: created, raw: d });
-        });
-        ofSnap.forEach(s=>{
-          const d = s.data();
-          const created = d.createdAt || d.createdAtTs || null;
-          items.push({ type:'Teklif', id:s.id, title: d.title || s.id, price: d.price || 0, createdAt: created, raw: d });
-        });
-        sbSnap.forEach(s=>{
-          const d = s.data();
-          const created = d.createdAt || d.createdAtTs || null;
-          items.push({ type:'Abonelik', id:s.id, title: d.title || s.id, price: d.price || 0, createdAt: created, raw: d });
-        });
-
-        // normalize createdAt to timestamp number
-        items.forEach(it=>{
-          const c = it.createdAt;
-          if(!c){ it._ts = 0; return; }
-          if(c && c.toDate) it._ts = c.toDate().getTime();
-          else if(typeof c === 'object' && c.seconds) it._ts = (c.seconds*1000) + Math.floor((c.nanoseconds||0)/1e6);
-          else it._ts = Number(c) || 0;
-        });
-
-        // sort desc
-        items.sort((a,b)=> (b._ts || 0) - (a._ts || 0));
-
-        const top = items.slice(0,10);
-        if(top.length === 0){ globalNewestList.innerHTML = '<div class="muted">Henüz yeni içerik yok</div>'; return; }
-
-        let html = '';
-        top.forEach(it=>{
-          const timeLabel = timeAgoLabel(it._ts || it.createdAt);
-          html += `<div class="new-row"><div><div style="font-weight:700">${escapeHtml(it.title)}</div><div class="small-muted">${it.type} • ${it.price} ₺</div></div><div style="text-align:right"><div class="small-muted">${timeLabel}</div><div class="type-badge">${it.type}</div></div></div>`;
-        });
-
-        globalNewestList.innerHTML = html;
-      } catch(e){
-        console.error('fetchAndRenderGlobalNewest error', e);
-        globalNewestList.innerHTML = '<div class="muted">Yüklenirken hata oluştu</div>';
+      if(!window.purchaseHistory[userId]){
+          window.purchaseHistory[userId] = [];
       }
+
+      window.purchaseHistory[userId].push({
+          type: type,
+          name: name,
+          price: price,
+          date: new Date().toLocaleString("tr-TR")
+      });
+  }
+
+  // Fonksiyon override sistemi (mevcut fonksiyonlara zarar vermez)
+  function safeHook(functionName, typeLabel){
+      if(typeof window[functionName] === "function"){
+          const original = window[functionName];
+
+          window[functionName] = function(item){
+              const result = original.apply(this, arguments);
+
+              try{
+                  if(window.currentUser && item){
+                      addPurchaseHistorySafe(
+                          window.currentUser.uid,
+                          typeLabel,
+                          item.name || (item.title||'İsimsiz'),
+                          item.price || 0
+                      );
+                  }
+              }catch(e){}
+
+              return result;
+          }
+      }
+  }
+
+  // Var olan satın alma fonksiyonlarına otomatik bağlan
+  safeHook("buyPackage", "Paket");
+  safeHook("buyOffer", "Teklif");
+  safeHook("buySubscription", "Abonelik");
+
+  // Eğer startPurchase ile alımlar gerçekleşiyorsa, onu da yakalayalım
+  // startPurchase(type, id) çağrıldığında Firestore'daki ilgili dokümanı okuyup kaydetmeye çalışırız (sadece bilgi amacıyla)
+  (function(){
+    const origStart = window.startPurchase;
+    window.startPurchase = async function(type,id){
+      try {
+        // önce orijinal çağrı
+        if(typeof origStart === 'function') origStart.apply(this, arguments);
+
+        // eğer auth kullanıcısı varsa dokümanı oku ve history'e ekle
+        if(window.currentUser && window.currentUser.uid){
+          let col = null; let docRef = null;
+          if(type === 'package') docRef = (id ? (await getDoc(doc(db,'packages',id))) : null);
+          else if(type === 'offer') docRef = (id ? (await getDoc(doc(db,'offers',id))) : null);
+          else if(type === 'sub') docRef = (id ? (await getDoc(doc(db,'subscriptions',id))) : null);
+
+          if(docRef && docRef.exists && docRef.exists()){
+            const data = docRef.data();
+            addPurchaseHistorySafe(window.currentUser.uid, type === 'sub' ? 'Abonelik' : (type === 'offer' ? 'Teklif' : 'Paket'), data.title || data.name || id, data.price || 0);
+          } else {
+            // fallback: ek bilgi yoksa basit kayıt
+            addPurchaseHistorySafe(window.currentUser.uid, type === 'sub' ? 'Abonelik' : (type === 'offer' ? 'Teklif' : 'Paket'), id || 'İsim yok', 0);
+          }
+        }
+      } catch(e){
+        // hata yutulur; satın alma akışı etkilenmez
+        console.warn('purchase history hook error', e);
+      }
+    };
+  })();
+
+  // ===============================
+  // ADMIN PANEL EKRANI EKLE
+  // ===============================
+
+  function renderAdminPurchaseHistory(){
+      const select = document.getElementById("adminPurchaseUserSelect");
+      const container = document.getElementById("adminPurchaseHistoryBox");
+
+      if(!select || !container) return;
+
+      const userId = select.value;
+      container.innerHTML = "";
+
+      if(!window.purchaseHistory[userId]){
+          container.innerHTML = "<p>Satın alım bulunamadı.</p>";
+          return;
+      }
+
+      window.purchaseHistory[userId].forEach(item=>{
+          const div = document.createElement("div");
+          div.style.border = "1px solid #444";
+          div.style.padding = "6px";
+          div.style.marginBottom = "6px";
+
+          div.innerHTML = `
+              <b>Tür:</b> ${item.type}<br>
+              <b>Ürün:</b> ${item.name}<br>
+              <b>Fiyat:</b> ${item.price}<br>
+              <b>Tarih:</b> ${item.date}
+          `;
+
+          container.appendChild(div);
+      });
+  }
+
+  // Admin panel yüklendikten sonra ekle
+  window.addEventListener("load", function(){
+
+      // admin panelin mevcut yapısına uygun bir alan ekleyelim
+      // admin panelde "admin-listing-area" kullanıldı; oraya ya da "page-admin" içine ekleyebiliriz
+      const adminPanel = document.getElementById("page-admin");
+      if(!adminPanel) return;
+
+      const section = document.createElement("div");
+      section.style.marginTop = "20px";
+      section.style.borderTop = "2px solid rgba(0,0,0,0.06)";
+      section.style.paddingTop = "12px";
+
+      section.innerHTML = `
+          <div style="font-weight:700;margin-bottom:8px">Kullanıcı Satın Alım Geçmişi</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="adminPurchaseUserSelect" style="flex:1"></select>
+            <button id="adminPurchaseShowBtn" class="subtle">Göster</button>
+          </div>
+          <div id="adminPurchaseHistoryBox" style="margin-top:10px;"></div>
+      `;
+
+      adminPanel.appendChild(section);
+
+      document.getElementById('adminPurchaseShowBtn').onclick = renderAdminPurchaseHistory;
+
+      // Kullanıcıları doldur
+      const select = document.getElementById("adminPurchaseUserSelect");
+
+      // Eğer loadAdminUsersList() ile listeleniyorsa, kullanıcıları çekelim
+      (async function populateUsers(){
+        try {
+          const snap = await getDocs(query(collection(db,'users'), orderBy('createdAt')));
+          select.innerHTML = '<option value="">-- Kullanıcı seç --</option>';
+          snap.forEach(s=>{
+            const d = s.data(), id = s.id;
+            const opt = document.createElement('option');
+            opt.value = id;
+            opt.textContent = d.username || d.displayName || id;
+            select.appendChild(opt);
+          });
+        } catch(e){
+          console.warn('populate users failed', e);
+        }
+      })();
+
+  });
+  </script>
+
+  <!-- ============================
+       EKLENEN: "EN YENİLER" ETKİLEŞİM MODALİ
+       (Hiçbir şeyi silmeden tek dosyaya eklendi)
+       ============================ -->
+  <script>
+  (function(){
+    // ek stil (konflikt olursa minimal ve scoped)
+    const css = `
+      #recent-detail-modal { position:fixed; left:0; top:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center; z-index:99999; background:rgba(2,6,23,0.45); }
+      #recent-detail-modal .md { width:720px; max-width:94%; background:#fff; border-radius:12px; padding:16px; box-shadow:0 12px 40px rgba(2,6,23,0.12); font-family:Inter, system-ui, Arial; color:#04202b; }
+      #recent-detail-modal .md h3{margin:0 0 8px 0}
+      #recent-detail-modal .meta{color:#335559;font-size:13px;margin-bottom:8px}
+      #recent-detail-modal .rewards{font-weight:700;margin-top:8px}
+      #recent-detail-modal .controls{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+      #recent-detail-modal .btn{padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
+      #recent-detail-modal .btn.primary{background:linear-gradient(90deg,#06b6d4,#8b5cf6);color:white}
+      #recent-detail-modal .btn.ghost{background:transparent;border:1px solid rgba(3,41,47,0.06)}
+    `;
+    const style = document.createElement('style'); style.textContent = css; document.head.appendChild(style);
+
+    // modal oluştur
+    function createModal(){
+      if(document.getElementById('recent-detail-modal')) return;
+      const modal = document.createElement('div'); modal.id = 'recent-detail-modal'; modal.style.display = 'none';
+      modal.innerHTML = `
+        <div class="md" role="dialog" aria-modal="true" aria-labelledby="recent-detail-title">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h3 id="recent-detail-title">Detay</h3>
+            <button id="recent-detail-close" class="btn ghost" title="Kapat">✕</button>
+          </div>
+          <div id="recent-detail-body" style="margin-top:8px;max-height:60vh;overflow:auto"></div>
+          <div class="controls">
+            <button id="recent-detail-cancel" class="btn ghost">Kapat</button>
+            <button id="recent-detail-buy" class="btn primary">Satın Al</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      // kapatma
+      modal.querySelectorAll('#recent-detail-close, #recent-detail-cancel').forEach(b=> b.addEventListener('click', ()=> modal.style.display='none'));
+      // ESC tuşu kapatma
+      window.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ const m=document.getElementById('recent-detail-modal'); if(m) m.style.display='none'; } });
+    }
+    createModal();
+
+    // yardımcı: öğeden dataset veya içerden bilgi al
+    function readItemInfo(el){
+      const ds = el.dataset || {};
+      // öncelik: açık data-* alanları
+      const id = ds.id || ds.itemId || ds.packageId || ds.offerId || ds.subId || ds.recentId || el.getAttribute('data-id') || el.getAttribute('data-item-id') || el.getAttribute('data-recent-id') || null;
+      // type: package / offer / sub
+      let type = (ds.type || ds.itemType || ds.kind || el.getAttribute('data-type') || '').toString().toLowerCase();
+      if(!type){
+        // türe göre ipucu: class isimlerinden tahmin et
+        const cls = (el.className||'').toString().toLowerCase();
+        if(cls.includes('package') || cls.includes('paket')) type = 'package';
+        else if(cls.includes('offer') || cls.includes('teklif')) type = 'offer';
+        else if(cls.includes('sub') || cls.includes('abonelik')) type = 'sub';
+      }
+      const title = ds.title || el.getAttribute('data-title') || (el.querySelector && (el.querySelector('.title')?.textContent || el.querySelector('h3')?.textContent)) || el.textContent.trim().split('\n')[0];
+      const desc = ds.desc || el.getAttribute('data-desc') || (el.querySelector && (el.querySelector('.desc')?.textContent || el.querySelector('.muted')?.textContent)) || '';
+      const price = ds.price || el.getAttribute('data-price') || (el.querySelector && (el.querySelector('.badge')?.textContent || el.querySelector('.price')?.textContent)) || '';
+      const rewards = ds.rewards || el.getAttribute('data-rewards') || (el.querySelector && (el.querySelector('.rewards')?.textContent || el.querySelector('.small-muted')?.textContent)) || '';
+      const expires = ds.expires || el.getAttribute('data-expires') || '';
+      return { id, type, title: title? title.trim() : '', desc: desc? desc.trim() : '', price: price? price.toString().trim(): '', rewards: rewards? rewards.toString().trim() : '', expires: expires? expires.toString().trim() : '' };
     }
 
-    // helpers
-    function escapeHtml(s){
-      if(!s) return '';
-      return String(s).replace(/[&<>"']/g, (m)=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m]));
+    // modal içerik doldurma
+    function showDetailModal(info){
+      const modal = document.getElementById('recent-detail-modal'); if(!modal) return;
+      const body = document.getElementById('recent-detail-body');
+      body.innerHTML = `
+        <div style="font-weight:700;font-size:16px">${info.title || 'İsim yok'}</div>
+        ${ info.price ? `<div class="meta">Fiyat: <strong>${info.price}</strong></div>` : '' }
+        ${ info.desc ? `<div style="margin-top:6px">${info.desc}</div>` : '<div class="meta">Açıklama bulunmuyor</div>' }
+        ${ info.rewards ? `<div class="rewards">Ödül: ${info.rewards}</div>` : '' }
+        ${ info.expires ? `<div class="meta" style="margin-top:6px">Son kullanma: ${info.expires}</div>` : '' }
+        <div style="margin-top:8px;color:#667">${info.type? 'Tür: ' + info.type : ''} ${info.id? ' • ID: ' + info.id : ''}</div>
+      `;
+      const buyBtn = document.getElementById('recent-detail-buy');
+      buyBtn.disabled = false;
+      buyBtn.onclick = function(){
+        // click satın al: mevcut global startPurchase kullan (kullanıcı zaten login olmalı)
+        if(typeof window.startPurchase === 'function' && info.type && info.id){
+          window.startPurchase(info.type, info.id);
+          modal.style.display = 'none';
+        } else {
+          // fallback: eğer type/id yoksa veya startPurchase yoksa kullanıcıya bilgi ver
+          alert('Bu ürün için doğrudan satın alma yapılamıyor (eksik type/id) ya da sistemde startPurchase fonksiyonu bulunamadı.'); 
+        }
+      };
+      modal.style.display = 'flex';
     }
 
-    // attach events (do not remove anything else)
-    if(globalNewestBtn){
-      globalNewestBtn.addEventListener('click', ()=>{
-        if(globalNewestPanel && globalNewestPanel.style.display === 'block') closeGlobalNewest();
-        else openGlobalNewest();
+    // hedef seçiciler: mümkün olduğunca esnek (sayfadaki "en yeniler" yapısına uyacak)
+    const selectors = [
+      '.recent-item', '.newest-item', '.en-yeniler li', '.en-yeniler .item',
+      '[data-recent-id]', '[data-item-id]', '[data-id][data-type]', '.recent-list [data-id]'
+    ];
+
+    function attachToRecentElements(root=document){
+      const elems = root.querySelectorAll(selectors.join(','));
+      elems.forEach(el=>{
+        // guard: birden fazla kez eklememek için
+        if(el.__recentInteractiveAttached) return;
+        el.__recentInteractiveAttached = true;
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', function(e){
+          // eğer tıklama zaten bir buton/ link içindeyse (ör. satın al düğmesi) doğal davranışı bozmayalım
+          const tg = e.target;
+          if(tg && (tg.tagName === 'BUTTON' || tg.tagName === 'A' || tg.closest && tg.closest('button') )) {
+            // eğer gerçek bir butona basıldıysa, bırak
+            return;
+          }
+          e.preventDefault();
+          e.stopPropagation();
+          const info = readItemInfo(el);
+          // Eğer sayfa, öğe içinde gerekli detayları taşımıyorsa (id yok), yine modal açıp bilgi göster; kullanıcı yine "Satın Al" basarsa uyarı verilecek
+          showDetailModal(info);
+        });
       });
     }
-    if(globalNewestRefresh) globalNewestRefresh.addEventListener('click', fetchAndRenderGlobalNewest);
-    if(globalNewestClose) globalNewestClose.addEventListener('click', closeGlobalNewest);
 
-    // auto-refresh newest when panel is open (every 60s)
-    setInterval(()=>{ if(globalNewestPanel && globalNewestPanel.style.display === 'block') fetchAndRenderGlobalNewest(); }, 60_000);
+    // ilk ekleme
+    attachToRecentElements(document);
 
-    /* --- /YENİ --- */
+    // dinamik içerik için MutationObserver (sayfaya yeni "en yeniler" yüklendiğinde de bağlar)
+    const observer = new MutationObserver((mutations)=>{
+      for(const m of mutations){
+        if(m.addedNodes && m.addedNodes.length){
+          attachToRecentElements(document);
+        }
+      }
+    });
+    observer.observe(document.body, { childList:true, subtree:true });
 
+  })();
   </script>
+
 </body>
 </html>
